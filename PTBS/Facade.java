@@ -1,3 +1,5 @@
+import GUI.*;
+
 /**
  * The interface class between the GUI and the underlining system, the
  * control logic and many of the operating functions are included in this class
@@ -33,6 +35,8 @@ public class Facade {
 	 * Show login GUI and return the login result.
 	 */
 	public boolean login() {
+		JFrame_Login jFrame_Login = new JFrame_Login();
+		jFrame_Login.start();
 		return false;
 	}
 
