@@ -1,11 +1,14 @@
-import GUI.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.Scanner;
 
 /**
  * The interface class between the GUI and the underlining system, the
  * control logic and many of the operating functions are included in this class
  */
 public class Facade {
-
+	boolean debug = true;
+	
 	/**
 	 * The type of the user: Buyer: 0, Seller 1
 	 */
@@ -35,9 +38,40 @@ public class Facade {
 	 * Show login GUI and return the login result.
 	 */
 	public boolean login() {
-		JFrame_Login jFrame_Login = new JFrame_Login();
-		jFrame_Login.start();
+		Scanner scan = new Scanner(System.in);
+		System.out.println("Welcome to the PTBS System. Please enter your username:");
+		String input = scan.nextLine();
+		if (verify(input, "files/BuyerInfo.txt")) {
+			if (debug) System.out.println(input + " is a Buyer");
+			System.out.println("Welcome back " + input);
+			return true;
+		}
+		if (verify(input, "files/SellerInfo.txt")) {
+			if (debug) System.out.println(input + " is a Seller");
+			System.out.println("Welcome back " + input);
+			return true;
+		}
+		
 		return false;
+	}
+	private  boolean verify(String username, String filename) {
+		try {
+			Scanner scan = new Scanner(new File(filename));
+			String str = "";
+			while (scan.hasNextLine()) {
+				str = scan.nextLine();
+				String[] user = str.split(":");
+				if (username.equals(user[0])) {
+					scan.close();
+					return true;
+				}
+			}
+			scan.close();
+			return false;
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			return false;
+		} 
 	}
 
 	/**
