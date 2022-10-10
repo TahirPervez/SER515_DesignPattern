@@ -7,7 +7,6 @@ import java.util.Scanner;
  * control logic and many of the operating functions are included in this class
  */
 public class Facade {
-	boolean debug = true;
 	
 	/**
 	 * The type of the user: Buyer: 0, Seller 1
@@ -39,21 +38,53 @@ public class Facade {
 	 */
 	public boolean login() {
 		Scanner scan = new Scanner(System.in);
-		System.out.println("Welcome to the PTBS System. Please enter your username:");
+		System.out.println("Welcome to the PTBS System.\nPlease enter your username:");
 		String input = scan.nextLine();
-		if (verify(input, "files/BuyerInfo.txt")) {
-			if (debug) System.out.println(input + " is a Buyer");
-			System.out.println("Welcome back " + input);
-			return true;
-		}
-		if (verify(input, "files/SellerInfo.txt")) {
-			if (debug) System.out.println(input + " is a Seller");
-			System.out.println("Welcome back " + input);
-			return true;
-		}
+		int productType = -1;
 		
+		if (verify(input, "files/BuyerInfo.txt")) {
+			if (main.debug) System.out.println(input + " is a Buyer");
+			System.out.println("Welcome back " + input);
+			
+			productType = askProductType();
+			scan.close();
+			if(productType == 1) {
+				MeatProductMenu menu = new MeatProductMenu();
+				menu.showMenu();
+			} else if (productType == 2){
+				ProduceProductMenu menu = new ProduceProductMenu();
+				menu.showMenu();
+			}
+			return true;
+		}
+		else if (verify(input, "files/SellerInfo.txt")) {
+			if (main.debug) System.out.println(input + " is a Seller");
+			System.out.println("Welcome back " + input);
+			
+			return true;
+		}
+		else {
+			if (main.debug) System.out.println(input + " is not a user");
+		}
 		return false;
 	}
+	private int askProductType() {
+		System.out.println("Press 1 for Meat or 2 for Produce");
+		Scanner scan = new Scanner(System.in);
+		
+		int res = -1;
+		
+		while (res == -1) {
+			int input = scan.nextInt();
+			if (input == 1) res = 1; 
+			else if (input == 2) res = 2;
+			else System.out.println("Invalid Input.\nPress 1 for Meat or 2 for Produce.");
+		}
+		
+		scan.close();
+		return res;
+	}
+	
 	private  boolean verify(String username, String filename) {
 		try {
 			Scanner scan = new Scanner(new File(filename));

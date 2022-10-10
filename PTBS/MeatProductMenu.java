@@ -1,15 +1,47 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.WindowConstants;
+import javax.swing.border.EmptyBorder;
+
 /**
  * One concrete implementation of ProductMenu for the meat product.
  * A subclass of ProductMenu. One of the concrete products of the factor
  * method.
  */
 public class MeatProductMenu implements ProductMenu {
-
 	/**
 	 *  
 	 */
 	public void showMenu() {
-
+		ArrayList<String> list = new ArrayList<String>();
+		Scanner fScan;
+		System.out.println("Meat:");
+		try {
+			fScan = new Scanner(new File("files/ProductInfo.txt"));
+			while (fScan.hasNext()) {
+				String str = fScan.next();
+				String[] split = str.split(":");
+				String type = split[0];
+				String item = split[1];
+				if (type.equals("Meat")) {
+					list.add(item);
+				}
+			}
+			fScan.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		for (int i = 0; i < list.size(); i++) {
+			System.out.println((i+1) + ". " + list.get(i));
+		}
 	}
 
 	/**
