@@ -22,12 +22,13 @@ public class MeatProductMenu implements ProductMenu {
 	 */
 	public void showMenu() {
 		ArrayList<String> list = new ArrayList<String>();
-		Scanner fScan;
+		Scanner scan;
+		main.dash();
 		System.out.println("Meat:");
 		try {
-			fScan = new Scanner(new File("files/ProductInfo.txt"));
-			while (fScan.hasNext()) {
-				String str = fScan.next();
+			scan = new Scanner(new File("files/ProductInfo.txt"));
+			while (scan.hasNext()) {
+				String str = scan.next();
 				String[] split = str.split(":");
 				String type = split[0];
 				String item = split[1];
@@ -35,7 +36,7 @@ public class MeatProductMenu implements ProductMenu {
 					list.add(item);
 				}
 			}
-			fScan.close();
+			scan.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}

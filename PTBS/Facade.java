@@ -1,5 +1,9 @@
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -21,12 +25,13 @@ public class Facade {
 	/**
 	 * The selected product category: 0: Meat, 1: Produce
 	 */
-	private int nProductCategory;
+	private int nProductCategory = -1;
 
 	/**
 	 * The list of products of the entire system.
 	 */
 	private ClassProductList theProductList;
+	private ArrayList<Product> productList;
 
 	/**
 	 * The current user.
@@ -38,54 +43,79 @@ public class Facade {
 	 */
 	public boolean login() {
 		Scanner scan = new Scanner(System.in);
-		System.out.println("Welcome to the PTBS System.\nPlease enter your username:");
-		String input = scan.nextLine();
+		main.dash();
+		System.out.println("Welcome to the PTBS System.\n"
+				+ "Please enter your username\n"
+				+ "Enter EXIT to exit\n"
+				+ "Enter NEW to create an account:");
 		int productType = -1;
-		
-		if (verify(input, "files/BuyerInfo.txt")) {
-			if (main.debug) System.out.println(input + " is a Buyer");
-			System.out.println("Welcome back " + input);
-			
-			productType = askProductType();
-			scan.close();
-			if(productType == 1) {
-				MeatProductMenu menu = new MeatProductMenu();
-				menu.showMenu();
-			} else if (productType == 2){
-				ProduceProductMenu menu = new ProduceProductMenu();
-				menu.showMenu();
+
+		String input;
+		do {
+			input = scan.nextLine();
+			if (input == "") {} // nothing happens
+			else if (input.equalsIgnoreCase("NEW")) {
+				createUser();
+				scan.close();
+				return false;
+			} else if(input.equalsIgnoreCase("EXIT")) {
+				System.out.println("Goodbye");
+				scan.close();
+				return false;
+			} else if (verify(input, "files/BuyerInfo.txt")) {
+				if (main.debug) System.out.println(input + " is a Buyer");
+				UserType = 0;
+				System.out.println("Welcome back " + input);
+				main.dash();
+				
+				askProductType();
+				scan.close();
+				if(nProductCategory == 0) {
+					MeatProductMenu menu = new MeatProductMenu();
+					menu.showMenu();
+				} else if (nProductCategory == 1){
+					ProduceProductMenu menu = new ProduceProductMenu();
+					menu.showMenu();
+				}
+				return true;
+			} else if (verify(input, "files/SellerInfo.txt")) {
+				if (main.debug) System.out.println(input + " is a Seller");
+				System.out.println("Welcome back " + input);
+				UserType = 1;
+				scan.close();
+				return true;
 			}
-			return true;
-		}
-		else if (verify(input, "files/SellerInfo.txt")) {
-			if (main.debug) System.out.println(input + " is a Seller");
-			System.out.println("Welcome back " + input);
-			
-			return true;
-		}
-		else {
-			if (main.debug) System.out.println(input + " is not a user");
-		}
+			else {
+				if (main.debug) System.out.println(input + " is not a user");
+			}
+		} while (!input.equalsIgnoreCase("EXIT"));
+		scan.close();
 		return false;
 	}
-	private int askProductType() {
+	
+	/**
+	 * get user input to determine meat or produce
+	 */
+	private void askProductType() {
 		System.out.println("Press 1 for Meat or 2 for Produce");
 		Scanner scan = new Scanner(System.in);
-		
-		int res = -1;
-		
-		while (res == -1) {
+				
+		while (nProductCategory == -1) {
 			int input = scan.nextInt();
-			if (input == 1) res = 1; 
-			else if (input == 2) res = 2;
+			if (input == 1) nProductCategory = 0;
+			else if (input == 2) nProductCategory = 1;
 			else System.out.println("Invalid Input.\nPress 1 for Meat or 2 for Produce.");
 		}
-		
 		scan.close();
-		return res;
 	}
-	
-	private  boolean verify(String username, String filename) {
+
+	/**
+	 * Checks for valid user
+	 * @param username - user to look for
+	 * @param filename - file to check
+	 * @return true if found, false if not
+	 */
+	private boolean verify(String username, String filename) {
 		try {
 			Scanner scan = new Scanner(new File(filename));
 			String str = "";
@@ -102,8 +132,9 @@ public class Facade {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 			return false;
-		} 
+		}
 	}
+	
 
 	/**
 	 * When clicking the add button of the ProductMenu, call this
@@ -174,8 +205,66 @@ public class Facade {
 	 * Create a user object according to the userinfoitem, the object
 	 * can be a buyer or a seller
 	 */
-	public void createUser(UserInfoItem userinfootem) {
-
+	public void createUser(UserInfoItem uii) {
+		String filename = "";
+		if (uii.getType().equals("Buyer")) {
+			filename = "files/BuyerInfo.txt";
+		} else {
+			filename = "files/SellerInfo.txt";
+		}
+		
+		try { // https://www.baeldung.com/java-append-to-file
+			FileWriter fw = new FileWriter(filename, true);
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.newLine();
+			bw.write(uii.getUsername() + ":" + uii.getPassword());
+			bw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("Account Created.");
+	}
+	/**
+	 * Create user in console
+	 */
+	public void createUser() {
+		main.dash();
+		Scanner scan = new Scanner(System.in);
+		boolean done = false;
+		do {
+			System.out.println("Enter what you would like your username to be.\nEnter EXIT to exit user creation:");
+			String input = scan.nextLine();
+			if (input.equalsIgnoreCase("EXIT")) {
+				return;
+			}
+			if (verify(input, "files/BuyerInfo.txt") || verify(input, "files/BuyerInfo.txt")) {
+				System.out.println("Sorry, name already in use.");
+			} else if (input.equalsIgnoreCase("NEW")) {
+				System.out.println("Invalid Name.\nEnter what you would like your username to be.\\nEnter EXIT to exit user creation:");
+			} else {
+				System.out.println("Enter what you would like your password to be.\nEnter EXIT to exit user creation:");
+				String password = scan.nextLine();
+				if (password.equalsIgnoreCase("EXIT")) {
+					return;
+				}				
+				
+				System.out.println("Press 1 for Buyer or 2 for Seller");
+				int accountType = -1;
+				while (accountType == -1) {
+					int type = scan.nextInt();
+					if (type == 1) accountType = 0;
+					else if (type == 2) accountType = 1;
+					else System.out.println("Invalid Input.\nPress 1 for Meat or 2 for Produce.");
+				}
+				scan.close();
+				
+				UserInfoItem uii = new UserInfoItem(input, password, accountType);
+				createUser(uii);
+				done = true;
+			}
+		} while (!done);
+		scan.close();
 	}
 
 	/**
@@ -184,7 +273,24 @@ public class Facade {
 	 *  
 	 */
 	public void createProductList() {
-
+		ArrayList<Product> list = new ArrayList<Product>();
+		Scanner scan;
+		main.dash();
+		System.out.println("Produce:");
+		try {
+			scan = new Scanner(new File("files/ProductInfo.txt"));
+			while (scan.hasNext()) {
+				String str = scan.next();
+				String[] split = str.split(":");
+				String type = split[0];
+				String item = split[1];
+				list.add(new Product(type, item));
+			}
+			scan.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		theProductList = null;
 	}
 
 	/**

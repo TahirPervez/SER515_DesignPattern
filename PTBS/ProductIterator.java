@@ -1,7 +1,7 @@
 /**
  * A concrete subclass of ListIterator that iterates the ProductLis
  */
-public class ProdutIterator {
+public class ProductIterator {
 
 	private ClassProductList classProductList;
 
@@ -10,6 +10,7 @@ public class ProdutIterator {
 	 * return false.
 	 */
 	public boolean hasNext() {
+		
 		return false;
 	}
 

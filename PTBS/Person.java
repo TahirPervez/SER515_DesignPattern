@@ -10,8 +10,7 @@ public abstract class Person {
 	 * Variable of ProductMenu. Use this variable to point to a concrete
 	 * productMenu object. Later, it will operate the object
 	 */
-	private ProductMenu theProductMenu;
-
+	
 	private ProductMenu productMenu;
 
 	/**

@@ -34,28 +34,10 @@ public class ProduceProductMenu implements ProductMenu {
 		txtbx_username.setColumns(30);
 		ContentPane.add(txtbx_username);		
 		*/
-		System.out.println("Produce:");
-		ArrayList<String> list = new ArrayList<String>();
-		Scanner fScan;
-		try {
-			fScan = new Scanner(new File("files/ProductInfo.txt"));
-			while (fScan.hasNext()) {
-				String str = fScan.next();
-				String[] split = str.split(":");
-				String type = split[0];
-				String item = split[1];
-				if (type.equals("Produce")) {
-					list.add(item);
-				}
-			}
-			fScan.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+		
 		for (int i = 0; i < list.size(); i++) {
 			System.out.println((i+1) + ". " + list.get(i));
 		}
-		
 	}
 
 	/**
