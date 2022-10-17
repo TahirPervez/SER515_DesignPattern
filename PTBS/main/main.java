@@ -1,8 +1,11 @@
 package main;
-import main.Facade;
 
 public class main {
 	public static boolean debug = true;
+	public static final String BUYERS = "files/BuyerInfo.txt";
+	public static final String SELLERS = "files/SellerInfo.txt";
+	public static final String PRODUCTS = "files/ProductInfo.txt";
+	public static final String OWNED = "files/UserProduct.txt";
 	
 	public static void main(String[] args) {
 		/*

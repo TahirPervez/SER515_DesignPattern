@@ -1,6 +1,8 @@
 package main;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -27,14 +29,133 @@ public class MeatProductMenu implements ProductMenu {
 	public void showMenu() {
 		list = getMenu();
 		main.dash();
-		if(main.debug) System.out.print("Meat Menu for ");
-		if(person.getUII().getType() == 0) System.out.println("Available:");
-		else if (person.getUII().getType() == 1) System.out.println("Owned:");
-		else System.out.println("Error");
+		if(main.debug) System.out.println("Meat Menu");
+		int type = person.getUII().getType();
+		if(type == 0) {
+			System.out.println("Available:");
+		}
+		else {
+			System.out.println("Owned:");
+		}
 		for (int i = 0; i < list.size(); i++) {
-			System.out.println(i + ". " + list.get(i));
+			System.out.println((i+1) + ". " + list.get(i));
+		}
+		int choice = -1;
+		if(type == 0) {
+			choice = getChoice(true);
+			buy(choice);
+		} else {
+			choice = getChoice(false);
+			sell(choice);
 		}
 		
+	}
+	private int getChoice(boolean buyer) {
+		Scanner scan = new Scanner(System.in);
+		int choice = -1;
+		
+		while(choice < 1 || choice > list.size()) {
+			if (buyer) System.out.println("Enter the number of the item you wish to buy.");
+			else System.out.println("Enter the number of the item you wish to sell.");
+			choice = scan.nextInt();
+			if (choice < 1 || choice > list.size() + 1) {
+				System.out.println("Invalid Entry");
+			}
+		}
+		scan.close();
+		return choice;
+	}
+	
+	private void buy(int choice) {
+		ArrayList<String> sellers = new ArrayList<String>();
+		String item = list.get(choice-1);
+		try {
+			Scanner fScan = new Scanner(new File(main.SELLERS));
+			String str = "";
+			while (fScan.hasNextLine()) {
+				str = fScan.nextLine();
+				String[] user = str.split(":");
+				sellers.add(user[0]); // get all sellers
+			}
+			fScan.close();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		
+		Scanner fScan;
+		try {
+			fScan = new Scanner(new File(main.OWNED));
+			boolean found = false;
+			StringBuffer strb = new StringBuffer();
+			
+			while (fScan.hasNext()) {
+				String next = fScan.nextLine();
+				String[] input = next.split(":");
+				//			is a seller					has the item		none have been bought
+				if(sellers.contains(input[0]) && (input[1].equalsIgnoreCase(item) && !found)) { // has the item	
+					found = true;
+				} else {
+					strb.append(next + System.lineSeparator());
+				}
+			}
+			strb.append(person.getUII().getUsername() + ":" + item + System.lineSeparator());
+			
+			try {
+				FileWriter fw = new FileWriter(main.OWNED, false);
+				BufferedWriter bw = new BufferedWriter(fw);
+				// bw.write(person.getUII().getUsername() + ":" + input[1]);
+				bw.write(strb.toString());
+				bw.newLine();
+				bw.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			fScan.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(main.debug) System.out.println("Sucessfully Bought.");
+	}
+	
+	private void sell(int choice) {
+		String item = list.get(choice-1);
+		
+		Scanner fScan;
+		try {
+			fScan = new Scanner(new File(main.OWNED));
+			boolean found = false;
+			StringBuffer strb = new StringBuffer();
+			
+			while (fScan.hasNext()) {
+				String next = fScan.nextLine();
+				String[] input = next.split(":");
+				//			is theirs								has the item		none have been bought
+				if(input[0].equals(person.getUII().getUsername()) && input[1].equalsIgnoreCase(item) && !found) { // has the item	
+					found = true;
+				} else {
+					strb.append(next + System.lineSeparator());
+				}
+			}
+			
+			try {
+				FileWriter fw = new FileWriter(main.OWNED, false);
+				BufferedWriter bw = new BufferedWriter(fw);
+				// bw.write(person.getUII().getUsername() + ":" + input[1]);
+				bw.write(strb.toString());
+				bw.newLine();
+				bw.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			fScan.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(main.debug) System.out.println("Sucessfully Sold.");
 	}
 	/**
 	 *  
@@ -59,8 +180,6 @@ public class MeatProductMenu implements ProductMenu {
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
-			
-			
 			try {
 				Scanner fScan = new Scanner(new File("files/UserProduct.txt"));
 				while(fScan.hasNext()) {
@@ -76,9 +195,6 @@ public class MeatProductMenu implements ProductMenu {
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
-			
-			main.dash();
-			System.out.println("A:");
 			for (String product:allAvailable) {
 				if(list.contains(product)) { // just the meats
 					available.add(product);
@@ -104,8 +220,6 @@ public class MeatProductMenu implements ProductMenu {
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
-			main.dash();
-			
 			for (String product:allOwned) {
 				owned.add(product);
 			}

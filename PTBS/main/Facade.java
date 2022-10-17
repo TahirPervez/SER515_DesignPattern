@@ -99,8 +99,8 @@ public class Facade {
 	 */
 	private boolean verify(String username, int type) {
 		String filename = "";
-		if(type==0) filename = "files/BuyerInfo.txt";
-		if(type==1) filename = "files/SellerInfo.txt";
+		if(type==0) filename = main.BUYERS;
+		if(type==1) filename = main.SELLERS;
 		try {
 			Scanner fScan = new Scanner(new File(filename));
 			String str = "";
@@ -118,7 +118,6 @@ public class Facade {
 						}
 						System.out.println("Invalid password.");
 					}
-					fScan.close();
 				}
 			}
 			fScan.close();
@@ -164,6 +163,7 @@ public class Facade {
 			}
 		}
 		menuList = menu.getMenu();
+		menu.showMenu();
 		
 	}
 
@@ -203,9 +203,9 @@ public class Facade {
 	public void createUser(UserInfoItem uii) {
 		String filename = "";
 		if (uii.getType() == 0) {
-			filename = "files/BuyerInfo.txt";
+			filename = main.BUYERS;
 		} else {
-			filename = "files/SellerInfo.txt";
+			filename = main.SELLERS;
 		}
 		
 		try { // https://www.baeldung.com/java-append-to-file
@@ -270,7 +270,7 @@ public class Facade {
 		main.dash();
 		System.out.println("Produce:");
 		try {
-			scan = new Scanner(new File("files/ProductInfo.txt"));
+			scan = new Scanner(new File(main.PRODUCTS));
 			while (scan.hasNext()) {
 				String str = scan.next();
 				String[] split = str.split(":");
