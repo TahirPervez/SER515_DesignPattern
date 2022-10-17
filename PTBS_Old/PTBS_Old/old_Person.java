@@ -1,3 +1,6 @@
+package old;
+import old.ProductMenu;
+
 /**
  * The abstract class on one side of the bridge
  * The Person class is involved in the bridge pattern to show the Menu, and

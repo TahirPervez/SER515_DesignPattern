@@ -1,3 +1,4 @@
+package old;
 public class UserInfoItem {
 	private String username;
 	private String password;

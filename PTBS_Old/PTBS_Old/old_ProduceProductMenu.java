@@ -1,3 +1,4 @@
+package old;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -8,6 +9,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+
+import old.ProductMenu;
 
 /**
  * One concrete implementation of ProductMenu for the produce product
@@ -34,7 +37,7 @@ public class ProduceProductMenu implements ProductMenu {
 		txtbx_username.setColumns(30);
 		ContentPane.add(txtbx_username);		
 		*/
-		
+		ArrayList<String> list = new ArrayList<String>();
 		for (int i = 0; i < list.size(); i++) {
 			System.out.println((i+1) + ". " + list.get(i));
 		}

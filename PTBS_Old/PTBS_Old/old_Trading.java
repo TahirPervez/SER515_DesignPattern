@@ -1,3 +1,4 @@
+package old;
 public class Trading {
 
 	private OfferingList offeringList;

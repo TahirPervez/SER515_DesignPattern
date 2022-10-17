@@ -1,3 +1,4 @@
+package main;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -6,90 +7,71 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import main.Buyer;
+//import main.ClassProductList;
+import main.MeatProductMenu;
+import main.Person;
+import main.ProduceProductMenu;
+//import main.Product;
+import main.UserInfoItem;
+import main.main;
+
 /**
  * The interface class between the GUI and the underlining system, the
  * control logic and many of the operating functions are included in this class
  */
 public class Facade {
 	
-	/**
-	 * The type of the user: Buyer: 0, Seller 1
-	 */
-	private int UserType;
-
-	/**
-	 * The object that holds the currently selected product.
-	 */
-	private Product theSelectedProduct;
-
-	/**
-	 * The selected product category: 0: Meat, 1: Produce
-	 */
-	private int nProductCategory = -1;
-
-	/**
-	 * The list of products of the entire system.
-	 */
-	private ClassProductList theProductList;
-	private ArrayList<Product> productList;
-
-	/**
-	 * The current user.
-	 */
-	private Person thePerson;
-
+	private int UserType; // The type of the user: Buyer: 0, Seller 1
+//	private Product theSelectedProduct;	// The object that holds the currently selected product.
+	private int nProductCategory = -1;	// The selected product category: 0: Meat, 1: Produce
+//	private ClassProductList theProductList;	// The list of products of the entire system.
+//	private ArrayList<Product> productList;	// The list of products of the entire system.
+	private ArrayList<Product> productList = new ArrayList<Product>();	// The list of products of the entire system.
+	private Person thePerson;	// The current user.
+	private UserInfoItem uii;
+	
+	static Scanner scan = new Scanner(System.in);
 	/**
 	 * Show login GUI and return the login result.
 	 */
 	public boolean login() {
-		Scanner scan = new Scanner(System.in);
 		main.dash();
 		System.out.println("Welcome to the PTBS System.\n"
-				+ "Please enter your username\n"
-				+ "Enter EXIT to exit\n"
-				+ "Enter NEW to create an account:");
-		int productType = -1;
-
+							+ "Please enter your username\n"
+							+ "Enter EXIT to exit\n"
+							+ "Enter NEW to create an account:");
 		String input;
 		do {
-			input = scan.nextLine();
+			if(scan.hasNext()) {
+				input = scan.nextLine();
+			} else {
+				input = "";
+			}
 			if (input == "") {} // nothing happens
 			else if (input.equalsIgnoreCase("NEW")) {
 				createUser();
-				scan.close();
-				return false;
 			} else if(input.equalsIgnoreCase("EXIT")) {
 				System.out.println("Goodbye");
-				scan.close();
 				return false;
-			} else if (verify(input, "files/BuyerInfo.txt")) {
+			} else if (verify(input, 0)) {
 				if (main.debug) System.out.println(input + " is a Buyer");
-				UserType = 0;
 				System.out.println("Welcome back " + input);
-				main.dash();
-				
-				askProductType();
-				scan.close();
-				if(nProductCategory == 0) {
-					MeatProductMenu menu = new MeatProductMenu();
-					menu.showMenu();
-				} else if (nProductCategory == 1){
-					ProduceProductMenu menu = new ProduceProductMenu();
-					menu.showMenu();
-				}
+				UserType = 0;
+				thePerson = new Buyer(uii);
 				return true;
-			} else if (verify(input, "files/SellerInfo.txt")) {
+			} else if (verify(input, 1)) {
 				if (main.debug) System.out.println(input + " is a Seller");
 				System.out.println("Welcome back " + input);
 				UserType = 1;
-				scan.close();
+				thePerson = new Seller(uii);
 				return true;
 			}
 			else {
-				if (main.debug) System.out.println(input + " is not a user");
+				if (main.debug) System.out.println(input + " is not a user, or there was a mistake with the username/password pair");
 			}
-		} while (!input.equalsIgnoreCase("EXIT"));
-		scan.close();
+		} while (scan.hasNext() && !input.equalsIgnoreCase("EXIT"));
+		
 		return false;
 	}
 	
@@ -98,15 +80,15 @@ public class Facade {
 	 */
 	private void askProductType() {
 		System.out.println("Press 1 for Meat or 2 for Produce");
-		Scanner scan = new Scanner(System.in);
 				
 		while (nProductCategory == -1) {
-			int input = scan.nextInt();
-			if (input == 1) nProductCategory = 0;
-			else if (input == 2) nProductCategory = 1;
-			else System.out.println("Invalid Input.\nPress 1 for Meat or 2 for Produce.");
+			if(scan.hasNext()) {
+				int input = scan.nextInt();
+				if (input == 1) nProductCategory = 0;
+				else if (input == 2) nProductCategory = 1;
+				else System.out.println("Invalid Input.\nPress 1 for Meat or 2 for Produce.");
+			}
 		}
-		scan.close();
 	}
 
 	/**
@@ -115,19 +97,31 @@ public class Facade {
 	 * @param filename - file to check
 	 * @return true if found, false if not
 	 */
-	private boolean verify(String username, String filename) {
+	private boolean verify(String username, int type) {
+		String filename = "";
+		if(type==0) filename = "files/BuyerInfo.txt";
+		if(type==1) filename = "files/SellerInfo.txt";
 		try {
-			Scanner scan = new Scanner(new File(filename));
+			Scanner fScan = new Scanner(new File(filename));
 			String str = "";
-			while (scan.hasNextLine()) {
-				str = scan.nextLine();
+			while (fScan.hasNextLine()) {
+				str = fScan.nextLine();
 				String[] user = str.split(":");
 				if (username.equals(user[0])) {
-					scan.close();
-					return true;
+					String password = "";
+					while (!password.equalsIgnoreCase("EXIT")) {
+						System.out.println("Enter your password or EXIT to return to login:");
+						password = scan.nextLine();
+						if (password.equals(user[1])) {
+							uii = new UserInfoItem(username, password, type);
+							return true;
+						}
+						System.out.println("Invalid password.");
+					}
+					fScan.close();
 				}
 			}
-			scan.close();
+			fScan.close();
 			return false;
 		} catch (IOException e1) {
 			e1.printStackTrace();
@@ -143,8 +137,6 @@ public class Facade {
 	 * SellerTradingMenu or BuyerTradingMenu based on the type of
 	 * the user. It will not update the product menu. The product menu
 	 * needs to be refreshed outside the function
-	 * 
-	 *  
 	 */
 	public void addTrading() {
 
@@ -157,17 +149,26 @@ public class Facade {
 	 * This function will view the trading information.
 	 * This function will call SellerTradingMenu or BuyerTradingMenu
 	 * according to the type of the user
-	 * 
-	 *  
 	 */
 	public void viewTrading() {
-
+		ArrayList<String> menuList = new ArrayList<String>();
+		main.dash();
+		nProductCategory = -1;
+		ProductMenu menu = null;
+		while(nProductCategory == -1) {
+			askProductType();
+			if(nProductCategory == 0) {
+				menu = new MeatProductMenu(thePerson);
+			} else {
+				menu = new ProduceProductMenu(thePerson);
+			}
+		}
+		menuList = menu.getMenu();
+		
 	}
 
 	/**
-	 * This function will view the given offering.
-	 * 
-	 *  
+	 * This function will view the given offering. 
 	 */
 	public void decideBidding() {
 
@@ -175,8 +176,6 @@ public class Facade {
 
 	/**
 	 * Set the deal flag of the given offering.
-	 * 
-	 *  
 	 */
 	public void discussBidding() {
 
@@ -184,8 +183,6 @@ public class Facade {
 
 	/**
 	 * Used by the buyer to submit the offering.
-	 * 
-	 *  
 	 */
 	public void submitBidding() {
 
@@ -194,8 +191,6 @@ public class Facade {
 	/**
 	 * Show the remind box to remind buyer of the upcoming overdue
 	 * trading window
-	 * 
-	 *  
 	 */
 	public void remind() {
 
@@ -207,7 +202,7 @@ public class Facade {
 	 */
 	public void createUser(UserInfoItem uii) {
 		String filename = "";
-		if (uii.getType().equals("Buyer")) {
+		if (uii.getType() == 0) {
 			filename = "files/BuyerInfo.txt";
 		} else {
 			filename = "files/SellerInfo.txt";
@@ -225,6 +220,7 @@ public class Facade {
 		}
 		System.out.println("Account Created.");
 	}
+	
 	/**
 	 * Create user in console
 	 */
@@ -238,7 +234,7 @@ public class Facade {
 			if (input.equalsIgnoreCase("EXIT")) {
 				return;
 			}
-			if (verify(input, "files/BuyerInfo.txt") || verify(input, "files/BuyerInfo.txt")) {
+			if (verify(input, 0) || verify(input, 1)) {
 				System.out.println("Sorry, name already in use.");
 			} else if (input.equalsIgnoreCase("NEW")) {
 				System.out.println("Invalid Name.\nEnter what you would like your username to be.\\nEnter EXIT to exit user creation:");
@@ -269,12 +265,8 @@ public class Facade {
 
 	/**
 	 * Create the product list of the entire system
-	 * 
-	 *  
 	 */
 	public void createProductList() {
-		ArrayList<Product> list = new ArrayList<Product>();
-		Scanner scan;
 		main.dash();
 		System.out.println("Produce:");
 		try {
@@ -284,13 +276,12 @@ public class Facade {
 				String[] split = str.split(":");
 				String type = split[0];
 				String item = split[1];
-				list.add(new Product(type, item));
+				productList.add(new Product(type, item)); 
 			}
-			scan.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-		theProductList = null;
+		productList = null;
 	}
 
 	/**
@@ -298,8 +289,6 @@ public class Facade {
 	 * reading the UserProduct.txt file. Match the product name with
 	 * theProductList. Attach the matched product object to the new
 	 * create user: Facade.thePerson. ProductLis
-	 * 
-	 *  
 	 */
 	public void AttatchProductToUser() {
 
@@ -317,11 +306,17 @@ public class Facade {
 	 * According to the real object (buyer or seller) and the
 	 * productLevel, it will call different menu creator and show the
 	 * menu differently according to the usertype
-	 * 
-	 *  
 	 */
 	public void productOperation() {
 
+	}
+	
+	/**
+	 * get product type
+	 * @return
+	 */
+	public int getProductCategory() {
+		return nProductCategory;
 	}
 
 }

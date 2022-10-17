@@ -1,3 +1,4 @@
+package old;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -10,6 +11,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
+
+import old.ProductMenu;
 
 /**
  * One concrete implementation of ProductMenu for the meat product.

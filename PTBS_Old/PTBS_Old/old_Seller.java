@@ -1,7 +1,11 @@
+package old;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import old.Person;
+import old.ProductMenu;
 
 /**
  * The concrete subclass of Person.
