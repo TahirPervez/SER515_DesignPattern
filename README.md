@@ -6,6 +6,11 @@
  # to run
  just run main
  
+ # Patterns
+	Facade - in facade, trading menu, product menu
+	Bridge - between person and productmenu
+	Factory - in buyer/seller and the meat/product product menu
+	
  # file conventions
  put in /SER515_DesignPattern/files
  BuyerInfo.txt - List of buyers, format as username:password
@@ -18,3 +23,4 @@
   - _DesignPattern-Spring22.pdf from project description.
   - ClassDiagram.asta copied from project description.
   
+	

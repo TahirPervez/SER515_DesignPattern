@@ -1,12 +1,8 @@
-tutu:Beef
-tutu:Tomato
-mimi:Beef
-mimi:Onion
-pepe:Beef
-pepe:Tomato
-tahir:Beef
-tahir:Lamb
-tahir:Onion
-tahir:Tomato
+SELL:pepe:Onion
+SELL:pepe:Onion
+SELL:pepe:Onion
+SELL:pepe:Onion
+SELL:pepe:Onion
+SELL:pepe:Onion
 tutu:Onion
 
